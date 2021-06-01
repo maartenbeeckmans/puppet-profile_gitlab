@@ -1,6 +1,6 @@
 ---
 profile_gitlab::http_port: 80
-profile_gitlab::ssh_port: 443
+profile_gitlab::ssh_port: 2222
 profile_gitlab::backup_on_calendar:
 profile_gitlab::install_location: '/opt/gitlab'
 profile_gitlab::install_device: '/dev/vdb'
