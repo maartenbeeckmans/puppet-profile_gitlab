@@ -1,0 +1,19 @@
+---
+profile_gitlab::http_port: 80
+profile_gitlab::ssh_port: 443
+profile_gitlab::backup_on_calendar:
+profile_gitlab::install_location: '/opt/gitlab'
+profile_gitlab::install_device: '/dev/vdb'
+profile_gitlab::data_location: '/var/opt/gitlab'
+profile_gitlab::data_device: '/dev/vdc'
+profile_gitlab::backup_on_calendar: 'daily'
+profile_gitlab::backup_location: '/srv/gitlab_backup'
+profile_gitlab::backup_device: '/dev/vdd'
+profile_gitlab::backup_ssh_command: '/usr/bin/ssh -T -x -p 22 -i /srv/rsnapshot/rsnapshot_key -o UserKnownHostsFile=/etc/rsnapshot_known_hosts'
+profile_gitlab::trusted_proxies: []
+profile_gitlab::http_sd_service_name: 'gitlab-http'
+profile_gitlab::http_sd_service_tags: []
+profile_gitlab::ssh_sd_service_name: 'gitlab-ssh'
+profile_gitlab::ssh_sd_service_tags: []
+profile_gitlab::manage_firewall_entry: true
+...
