@@ -26,7 +26,7 @@ class profile_gitlab (
   $_gitlab_rails_config = {
     'initial_root_password' => $initial_root_password,
     'backup_path'           => $backup_location,
-    'trusted_proxies'       => concat($trusted_proxies, $facts['networking']['ip'], '127.0.0.1', 'localhost'])
+    'trusted_proxies'       => concat($trusted_proxies, [$facts['networking']['ip'], '127.0.0.1', 'localhost']),
     'gitlab_default_theme'  => 2,
     'gitlab_shell_ssh_port' => $ssh_port,
   }
@@ -36,7 +36,7 @@ class profile_gitlab (
     'listen_port'  => $http_port,
   }
 
-  profile_base::mount{ $install_location,
+  profile_base::mount{ $install_location:
     device => $install_device,
   }
   -> profile_base::mount{ $data_location:
