@@ -4,7 +4,6 @@
 class profile_gitlab (
   String                                     $initial_root_password,
   Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $external_url,
-  Stdlib::Port                               $external_port,
   Stdlib::Port                               $http_port,
   Stdlib::Port                               $ssh_port,
   String                                     $backup_on_calendar,
@@ -44,7 +43,6 @@ class profile_gitlab (
   }
   -> class { 'gitlab':
     external_url  => $external_url,
-    external_port => $external_port,
     gitlab_rails  => $_gitlab_rails_config,
     nginx         => $_nginx_config,
   }
