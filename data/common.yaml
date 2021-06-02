@@ -1,4 +1,5 @@
 ---
+# Gitlab configuration
 profile_gitlab::http_port: 80
 profile_gitlab::ssh_port: 22
 profile_gitlab::external_ssh_port: 2222
@@ -17,4 +18,15 @@ profile_gitlab::http_sd_service_tags: []
 profile_gitlab::ssh_sd_service_name: 'gitlab-ssh'
 profile_gitlab::ssh_sd_service_tags: []
 profile_gitlab::manage_firewall_entry: true
+
+# Gitlab runner configuration
+profile_gitlab::runner::manage_repo: true
+profile_gitlab::runner::repo_name: 'gitlab_runner'
+profile_gitlab::runner::repo_location: 'https://packages.gitlab.com/runner/gitlab-runner/debian/'
+profile_gitlab::runner::repo_key: 
+  id: 'F6403F6544A38863DAA0B6E03F01618A51312F3F'
+  source: 'https://packages.gitlab.com/runner/gitlab-runner/gpgkey'
+profile_gitlab::runner::package_name: 'gitlab-runner'
+profile_gitlab::runner::package_ensure: 'installed'
+profile_gitlab::runner::manage_pin: true
 ...
