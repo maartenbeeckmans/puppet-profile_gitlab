@@ -29,4 +29,5 @@ profile_gitlab::runner::repo_key:
 profile_gitlab::runner::package_name: 'gitlab-runner'
 profile_gitlab::runner::package_ensure: 'installed'
 profile_gitlab::runner::manage_pin: true
+profile_gitlab::runner::register: true
 ...
