@@ -6,6 +6,7 @@ class profile_gitlab (
   Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $external_url,
   Stdlib::Port                               $http_port,
   Stdlib::Port                               $ssh_port,
+  Stdlib::Port                               $external_ssh_port,
   String                                     $backup_on_calendar,
   Stdlib::AbsolutePath                       $install_location,
   String                                     $install_device,
@@ -27,7 +28,7 @@ class profile_gitlab (
     'backup_path'           => $backup_location,
     'trusted_proxies'       => concat($trusted_proxies, [$facts['networking']['ip'], '127.0.0.1', 'localhost']),
     'gitlab_default_theme'  => 2,
-    'gitlab_shell_ssh_port' => $ssh_port,
+    'gitlab_shell_ssh_port' => $external_ssh_port,
   }
 
   $_nginx_config = {
