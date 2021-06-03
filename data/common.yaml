@@ -19,6 +19,16 @@ profile_gitlab::ssh_sd_service_name: 'gitlab-ssh'
 profile_gitlab::ssh_sd_service_tags: []
 profile_gitlab::manage_firewall_entry: true
 
+# Gitlab deployment configuration
+profile_gitlab::deployment::manage_user: true
+profile_gitlab::deployment::manage_group: true
+profile_gitlab::deployment::user_name: 'gitlab'
+profile_gitlab::deployment::user_group: 'gitlab'
+profile_gitlab::deployment::user_additional_groups: []
+profile_gitlab::deployment::home: '/var/lib/gitlab'
+profile_gitlab::deployment::ssh_key:
+profile_gitlab::deployment::ssh_key_type: 'ed25519'
+
 # Gitlab runner configuration
 profile_gitlab::runner::manage_repo: true
 profile_gitlab::runner::repo_name: 'gitlab_runner'
