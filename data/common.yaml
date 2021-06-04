@@ -3,11 +3,11 @@
 profile_gitlab::http_port: 80
 profile_gitlab::ssh_port: 22
 profile_gitlab::external_ssh_port: 2222
-profile_gitlab::backup_on_calendar:
 profile_gitlab::install_location: '/opt/gitlab'
 profile_gitlab::install_device: '/dev/vdb'
 profile_gitlab::data_location: '/var/opt/gitlab'
 profile_gitlab::data_device: '/dev/vdc'
+profile_gitlab::gitlab_backup: true
 profile_gitlab::backup_on_calendar: 'daily'
 profile_gitlab::backup_location: '/srv/gitlab_backup'
 profile_gitlab::backup_device: '/dev/vdd'

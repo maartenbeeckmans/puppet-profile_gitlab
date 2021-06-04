@@ -7,11 +7,12 @@ class profile_gitlab (
   Stdlib::Port                               $http_port,
   Stdlib::Port                               $ssh_port,
   Stdlib::Port                               $external_ssh_port,
-  String                                     $backup_on_calendar,
   Stdlib::AbsolutePath                       $install_location,
   String                                     $install_device,
   Stdlib::AbsolutePath                       $data_location,
   String                                     $data_device,
+  Boolean                                    $gitlab_backup,
+  String                                     $backup_on_calendar,
   Stdlib::AbsolutePath                       $backup_location,
   String                                     $backup_device,
   String                                     $backup_ssh_command,
@@ -43,9 +44,9 @@ class profile_gitlab (
     device => $data_device,
   }
   -> class { 'gitlab':
-    external_url  => $external_url,
-    gitlab_rails  => $_gitlab_rails_config,
-    nginx         => $_nginx_config,
+    external_url => $external_url,
+    gitlab_rails => $_gitlab_rails_config,
+    nginx        => $_nginx_config,
   }
 
   if $manage_firewall_entry {
@@ -57,6 +58,10 @@ class profile_gitlab (
       dport  => $ssh_port,
       action => 'accept',
     }
+  }
+
+  if $gitlab_backup {
+    include profile_gitlab::backup
   }
 
   if $manage_sd_service {
