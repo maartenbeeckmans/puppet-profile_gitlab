@@ -10,12 +10,12 @@ class profile_gitlab::backup (
   profile_base::systemd_timer { 'gitlab-backup':
     description => 'Gitlab backup',
     on_calendar => $on_calendar,
-    command     => "${gitlab::rake_exec} gitlab::backup::create CRON=1"
+    command     => "${gitlab::rake_exec} gitlab:backup:create CRON=1"
   }
 
   profile_base::mount{ $location:
     device => $device,
-    owner  => 'rsnapshot',
+    owner  => 'git',
     group  => 'rsnapshot',
     mode   => '0755',
   }
