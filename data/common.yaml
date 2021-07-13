@@ -7,6 +7,7 @@ profile_gitlab::backup_ssh_command: '/usr/bin/ssh -T -x -p 22 -i /srv/rsnapshot/
 profile_gitlab::data_device: '/dev/vdc'
 profile_gitlab::data_location: '/var/opt/gitlab'
 profile_gitlab::external_ssh_port: 2222
+profile_gitlab::external_url: "http://%{facts.networking.fqdn}"
 profile_gitlab::gitlab_backup: true
 profile_gitlab::gitlab_email_display_name: "%{facts.networking.fqdn}"
 profile_gitlab::gitlab_email_from: "gitlab@%{facts.networking.domain}"
@@ -17,6 +18,7 @@ profile_gitlab::gitlab_exporter_sd_service_tags: ['metrics']
 profile_gitlab::gitlab_pages_port: 8090
 profile_gitlab::gitlab_pages_sd_service_name: gitlab-pages
 profile_gitlab::gitlab_pages_sd_service_tags: []
+profile_gitlab::gitlab_ssh_host: "%{facts.networking.fqdn}"
 profile_gitlab::http_port: 80
 profile_gitlab::http_sd_service_name: 'gitlab-http'
 profile_gitlab::http_sd_service_tags: []
@@ -27,6 +29,7 @@ profile_gitlab::ldap_servers: ~
 profile_gitlab::listen_address: "%{facts.networking.ip}"
 profile_gitlab::manage_firewall_entry: true
 profile_gitlab::monitoring_hosts: []
+profile_gitlab::pages_external_url: "http://pages-%{facts.networking.fqdn}"
 profile_gitlab::postgres_exporter_port: 9187
 profile_gitlab::postgres_exporter_sd_service_name: 'postgres-exporter'
 profile_gitlab::postgres_exporter_sd_service_tags: ['metrics']
@@ -36,6 +39,7 @@ profile_gitlab::redis_exporter_sd_service_tags: ['metrics']
 profile_gitlab::registry_debug_port: 5001
 profile_gitlab::registry_debug_sd_service_name: 'gitlab-registry-debug'
 profile_gitlab::registry_debug_sd_service_tags: []
+profile_gitlab::registry_external_url: "http://registry-%{facts.networking.fqdn}"
 profile_gitlab::registry_host: "%{facts.networking.fqdn}"
 profile_gitlab::registry_port: 5000
 profile_gitlab::registry_sd_service_name: 'gitlab-registry'

@@ -20,6 +20,7 @@ class profile_gitlab (
   Stdlib::Port                               $gitlab_pages_port,
   String                                     $gitlab_pages_sd_service_name,
   Array                                      $gitlab_pages_sd_service_tags,
+  Stdlib::Host                               $gitlab_ssh_host,
   Stdlib::Port                               $http_port,
   String                                     $http_sd_service_name,
   Array                                      $http_sd_service_tags,
@@ -30,6 +31,7 @@ class profile_gitlab (
   Stdlib::IP::Address                        $listen_address,
   Boolean                                    $manage_firewall_entry,
   Array[Stdlib::Host]                        $monitoring_hosts,
+  Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $pages_external_url,
   Stdlib::Port                               $postgres_exporter_port,
   String                                     $postgres_exporter_sd_service_name,
   Array                                      $postgres_exporter_sd_service_tags,
@@ -39,6 +41,7 @@ class profile_gitlab (
   Stdlib::Port                               $registry_debug_port,
   String                                     $registry_debug_sd_service_name,
   Array                                      $registry_debug_sd_service_tags,
+  Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $registry_external_url,
   Stdlib::Host                               $registry_host,
   Stdlib::Port                               $registry_port,
   String                                     $registry_sd_service_name,
@@ -47,7 +50,7 @@ class profile_gitlab (
   String                                     $ssh_sd_service_name,
   Array                                      $ssh_sd_service_tags,
   Array[Stdlib::Host]                        $trusted_proxies,
-  String                                     $initial_root_password             = cache_data('profile_gitlab', 'gitlab_initial_root_password', random_password()), # lint:ignore:140chars
+  String                                     $initial_root_password             = extlib::cache_data('profile_gitlab', 'gitlab_initial_root_password', extlib::random_password(42)), # lint:ignore:140chars
   Boolean                                    $manage_sd_service                 = lookup('manage_sd_service', Boolean, first, true),
 ) {
   $_alertmanager_config = {
@@ -68,16 +71,11 @@ class profile_gitlab (
   $_gitlab_rails_config = {
     'initial_root_password'                               => $initial_root_password,
     'backup_path'                                         => $backup_location,
-    'backup_keep_time'                                    => '604800'
-    'trusted_proxies'                                     => concat(
-      $trusted_proxies,
-      [$listen_address, '127.0.0.1', 'localhost']
-    ),
-    'monitoring_whitelist'                                => concat(
-      $monitoring_hosts,
-      [$listen_address, '127.0.0.1', 'localhost']
-    ),
+    'backup_keep_time'                                    => '604800',
+    'trusted_proxies'                                     => concat($trusted_proxies, [$listen_address, '127.0.0.1', 'localhost']), # lint:ignore:140chars
+    'monitoring_whitelist'                                => concat($monitoring_hosts, [$listen_address, '127.0.0.1', 'localhost']), # lint:ignore:140chars
     'gitlab_default_theme'                                => 2,
+    'gitlab_ssh_host'                                     => $gitlab_ssh_host,
     'gitlab_shell_ssh_port'                               => $external_ssh_port,
     'gitlab_default_projects_features_issues'             => false,
     'gitlab_default_projects_features_merge_requests'     => false,
@@ -90,7 +88,9 @@ class profile_gitlab (
     'gitlab_email_reply_to'                               => $gitlab_email_reply_to,
     'registry_enabled'                                    => true,
     'registry_host'                                       => $registry_host,
+    'registry_path'                                       => '/var/opt/gitlab/gitlab-rails/shared/registry', # lint:ignore:140chars
     'registry_port'                                       => $registry_port,
+    'time_zone'                                           => 'Europe/Brussels',
     'ldap_enabled'                                        => $ldap_auth,
     'ldap_servers'                                        => $ldap_servers,
   }
@@ -112,7 +112,7 @@ class profile_gitlab (
   $_registry_config = {
     'enable'             => true,
     'registry_http_addr' => "${listen_address}:${registry_port}",
-    'debug_addr        ' => "${listen_address}:${registry_debug_port}",
+    'debug_addr'         => "${listen_address}:${registry_debug_port}",
   }
 
   $_redis_exporter_config = {
@@ -136,19 +136,20 @@ class profile_gitlab (
     device => $data_device,
   }
   -> class { 'gitlab':
-    alertmanager      => $_alertmanager_config,
-    external_url      => $external_url,
-    external_port     => $http_port,
-    gitlab_exporter   => $_gitlab_exporter_config,
-    gitlab_pages      => $_gitlab_pages_config,
-    gitlab_rails      => $_gitlab_rails_config,
-    grafana           => $_grafana_config,
-    nginx             => $_nginx_config,
-    node_exporter     => $_node_exporter_config,
-    registry          => $_registry_config,
-    redis_exporter    => $_redis_exporter_config,
-    postgres_exporter => $_postgres_exporter_config,
-    prometheus        => $_prometheus_config,
+    alertmanager          => $_alertmanager_config,
+    external_url          => $external_url,
+    gitlab_exporter       => $_gitlab_exporter_config,
+    gitlab_pages          => $_gitlab_pages_config,
+    gitlab_rails          => $_gitlab_rails_config,
+    grafana               => $_grafana_config,
+    nginx                 => $_nginx_config,
+    node_exporter         => $_node_exporter_config,
+    registry              => $_registry_config,
+    registry_external_url => $registry_external_url,
+    redis_exporter        => $_redis_exporter_config,
+    pages_external_url    => $pages_external_url,
+    postgres_exporter     => $_postgres_exporter_config,
+    prometheus            => $_prometheus_config,
   }
 
   if $manage_firewall_entry {

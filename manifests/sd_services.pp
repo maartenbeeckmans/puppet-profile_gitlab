@@ -33,8 +33,8 @@ class profile_gitlab::sd_services (
   Array               $registry_sd_service_tags          = $::profile_gitlab::registry_sd_service_tags,
 
   Stdlib::Port        $registry_debug_port               = $::profile_gitlab::registry_debug_port,
-  String              $registry_debug_sd_service_name    = $::profile_gitlab::registry_degub_sd_service_name,
-  Array               $registry_debug_sd_service_tags    = $::profile_gitlab::registry_degub_sd_service_tags,
+  String              $registry_debug_sd_service_name    = $::profile_gitlab::registry_debug_sd_service_name,
+  Array               $registry_debug_sd_service_tags    = $::profile_gitlab::registry_debug_sd_service_tags,
 ) {
   consul::service { $http_sd_service_name:
     checks => [
