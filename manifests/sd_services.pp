@@ -39,7 +39,7 @@ class profile_gitlab::sd_services (
   consul::service { $http_sd_service_name:
     checks => [
       {
-        http     => "http://${listen_address}:${http_port}/-/health",
+        tcp      => "${facts['networking']['fqdn']}:${http_port}",
         interval => '10s'
       }
     ],
@@ -50,11 +50,11 @@ class profile_gitlab::sd_services (
   consul::service { $ssh_sd_service_name:
     checks => [
       {
-        tcp      => "${listen_address}:${ssh_port}",
+        tcp      => "${listen_address}:22",
         interval => '10s'
       }
     ],
-    port   => $ssh_port,
+    port   => 22,
     tags   => $ssh_sd_service_tags,
   }
 
@@ -83,7 +83,7 @@ class profile_gitlab::sd_services (
   consul::service { $gitlab_exporter_sd_service_name:
     checks => [
       {
-        http     => "http://${listen_address}:${gitlab_exporter_port}",
+        http     => "http://${listen_address}:${gitlab_exporter_port}/metrics",
         interval => '10s'
       }
     ],
@@ -94,7 +94,7 @@ class profile_gitlab::sd_services (
   consul::service { $gitlab_pages_sd_service_name:
     checks => [
       {
-        http     => "http://${listen_address}:${gitlab_pages_port}",
+        http     => "http://${facts['networking']['fqdn']}:${gitlab_pages_port}",
         interval => '10s'
       }
     ],

@@ -65,7 +65,6 @@ class profile_gitlab (
 
   $_gitlab_pages_config = {
     'enable'       => true,
-    'listen_proxy' => "${listen_address}:${gitlab_pages_port}"
   }
 
   $_gitlab_rails_config = {
