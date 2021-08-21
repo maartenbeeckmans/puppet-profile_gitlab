@@ -61,13 +61,7 @@ profile_gitlab::deployment::ssh_key_type: 'ed25519'
 
 # Gitlab runner configuration
 profile_gitlab::runner::manage_repo: true
-profile_gitlab::runner::repo_name: 'gitlab_runner'
-profile_gitlab::runner::repo_location: 'https://packages.gitlab.com/runner/gitlab-runner/debian/'
-profile_gitlab::runner::repo_key: 
-  id: 'F6403F6544A38863DAA0B6E03F01618A51312F3F'
-  source: 'https://packages.gitlab.com/runner/gitlab-runner/gpgkey'
-profile_gitlab::runner::package_name: 'gitlab-runner'
-profile_gitlab::runner::package_ensure: 'installed'
-profile_gitlab::runner::manage_pin: true
-profile_gitlab::runner::register: true
+profile_gitlab::runner::gitlab_runner_exporter_listen_address: "%{factes.networking.ip}"
+profile_gitlab::runner::gitlab_runner_expoter_ports: 8080
+profile_gitlab::runner::gitlab_runner_exportern_tags: ['metrics']
 ...

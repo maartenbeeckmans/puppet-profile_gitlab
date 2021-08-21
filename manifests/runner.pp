@@ -3,50 +3,55 @@
 #
 class profile_gitlab::runner (
   Boolean                                    $manage_repo,
-  String                                     $repo_name,
-  Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $repo_location,
-  Hash                                       $repo_key,
-  String                                     $package_name,
-  String                                     $package_ensure,
-  Boolean                                    $manage_pin,
-  Boolean                                    $register,
+  Stdlib::IP::Address                        $gitlab_runner_exporter_listen_address,
+  Stdlib::Port                               $gitlab_runner_exporter_port,
+  Array                                      $gitlab_runner_exporter_tags,
   Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl] $gitlab_url,
   String                                     $gitlab_token,
+  Boolean                                    $manage_sd_service                     = lookup('manage_sd_service', Boolean, first, true),
 ) {
-  if $manage_repo {
-    apt::source { $repo_name:
-      comment  => 'Gitlab runner configuration',
-      location => $repo_location,
-      key      => $repo_key,
-      before   => Package[$package_name],
-    }
-  }
-
   file { '/etc/profile.d/gitlab_runner.sh':
     ensure  => file,
     mode    => '0644',
     content => 'GITLAB_RUNNER_DISABLE_SKEL=true',
-    before  => Package[$package_name],
+    before  => Class['gitlab_ci_runner'],
   }
 
-  package { $package_name:
-    ensure => $package_ensure,
+  class { 'gitlab_ci_runner':
+    concurrent     => $facts['processors']['count'],
+    log_level      => 'info',
+    log_format     => 'text',
+    check_interval => 1,
+    listen_address => "${gitlab_runner_exporter_listen_address}:${gitlab_runner_exporter_port}",
+    manage_docker  => false,
+    manage_repo    => $manage_repo,
   }
 
-  if $manage_pin {
-    apt::pin { 'gitlab-runner-pin':
-      explanation => 'Prefer GitLab provided packages over Debian native ones',
-      packages    => $package_name,
-      origin      => $repo_location,
-      priority    => 1001,
+  if $manage_sd_service {
+    consul::service { 'gitlab-runner':
+      checks => [
+        {
+          http     => "http://${gitlab_runner_exporter_listen_address}:${gitlab_runner_exporter_port}",
+          interval => '10s'
+        }
+      ],
+      port   => $gitlab_runner_exporter_port,
+      tags   => $gitlab_runner_exporter_tags,
     }
   }
 
-  if $register {
-    exec { 'registering_runner':
-      command    => "/usr/bin/gitlab-runner register --non-interactive --url ${gitlab_url} --registration-token ${gitlab_token} --executor docker --docker-image alpine:latest --description ${facts[networking][fqdn]} --tag-list puppet_managed --run-untagged=true --locked=false --access-level=not_protected && touch /etc/gitlab-runner/registered",
-      creates    => '/etc/gitlab-runner/registered',
-      subscribe  => Package[$package_name],
-    }
+  gitlab_ci_runner::runner { 'runner':
+    ensure  => present,
+    config  => {
+      url      => $gitlab_url,
+      token    => $gitlab_token,
+      executor => 'docker',
+      limit    => $facts['processors']['count'],
+      docker   => {
+        image => 'alpine:latest',
+      },
+    },
+    require => Class['gitlab_ci_runner::config'],
+    notify  => Class['gitlab_ci_runner::service'],
   }
 }
