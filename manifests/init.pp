@@ -20,6 +20,9 @@ class profile_gitlab (
   Stdlib::Port                               $gitlab_pages_port,
   String                                     $gitlab_pages_sd_service_name,
   Array                                      $gitlab_pages_sd_service_tags,
+  Stdlib::Port                               $gitlab_pages_exporter_port,
+  String                                     $gitlab_pages_exporter_sd_service_name,
+  Array                                      $gitlab_pages_exporter_sd_service_tags,
   Stdlib::Host                               $gitlab_ssh_host,
   Stdlib::Port                               $http_port,
   String                                     $http_sd_service_name,
@@ -65,6 +68,9 @@ class profile_gitlab (
 
   $_gitlab_pages_config = {
     'enable'       => true,
+    'listen_proxy' => "${listen_address}:${gitlab_pages_port}",
+    'status_uri'   => '/@status',
+    'metrics_address' => "${listen_address}:${gitlab_pages_exporter_port}"
   }
 
   $_gitlab_rails_config = {
@@ -76,12 +82,12 @@ class profile_gitlab (
     'gitlab_default_theme'                                => 2,
     'gitlab_ssh_host'                                     => $gitlab_ssh_host,
     'gitlab_shell_ssh_port'                               => $external_ssh_port,
-    'gitlab_default_projects_features_issues'             => false,
-    'gitlab_default_projects_features_merge_requests'     => false,
-    'gitlab_default_projects_features_wiki'               => false,
-    'gitlab_default_projects_features_snippets'           => false,
-    'gitlab_default_projects_features_builds'             => false,
-    'gitlab_default_projects_features_container_registry' => false,
+    'gitlab_default_projects_features_issues'             => true,
+    'gitlab_default_projects_features_merge_requests'     => true,
+    'gitlab_default_projects_features_wiki'               => true,
+    'gitlab_default_projects_features_snippets'           => true,
+    'gitlab_default_projects_features_builds'             => true,
+    'gitlab_default_projects_features_container_registry' => true,
     'gitlab_email_from'                                   => $gitlab_email_from,
     'gitlab_email_display_name'                           => $gitlab_email_display_name,
     'gitlab_email_reply_to'                               => $gitlab_email_reply_to,
@@ -99,9 +105,11 @@ class profile_gitlab (
   }
 
   $_nginx_config = {
-    'listen_https'           => false,
-    'listen_port'            => $http_port,
-    'redirect_http_to_https' => false,
+    'listen_https'            => false,
+    'listen_addresses'        => [$listen_address],
+    'listen_port'             => $http_port,
+    'real_ip_trusted_address' => concat($trusted_proxies, [$listen_address, '127.0.0.1', 'localhost']), # lint:ignore:140chars
+    'redirect_http_to_https'  => false,
   }
 
   $_node_exporter_config = {
@@ -114,9 +122,21 @@ class profile_gitlab (
     'debug_addr'         => "${listen_address}:${registry_debug_port}",
   }
 
+  $_registry_nginx_config = {
+    'redirect_http_to_https' => false,
+    'listen_addresses'       => [$listen_address],
+    'listen_port'            => $registry_port,
+   } 
+
   $_redis_exporter_config = {
     'enable'         => true,
     'listen_address' => "${listen_address}:${redis_exporter_port}"
+  }
+
+  $_pages_nginx_config = {
+    'redirect_http_to_https' => false,
+    'listen_addresses'       => [$listen_address],
+    'listen_port'            => $gitlab_pages_port,
   }
 
   $_postgres_exporter_config = {
@@ -144,8 +164,10 @@ class profile_gitlab (
     nginx                 => $_nginx_config,
     node_exporter         => $_node_exporter_config,
     registry              => $_registry_config,
+    registry_nginx        => $_registry_nginx_config,
     registry_external_url => $registry_external_url,
     redis_exporter        => $_redis_exporter_config,
+    pages_nginx           => $_pages_nginx_config,
     pages_external_url    => $pages_external_url,
     postgres_exporter     => $_postgres_exporter_config,
     prometheus            => $_prometheus_config,

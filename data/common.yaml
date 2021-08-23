@@ -18,6 +18,9 @@ profile_gitlab::gitlab_exporter_sd_service_tags: ['metrics']
 profile_gitlab::gitlab_pages_port: 8090
 profile_gitlab::gitlab_pages_sd_service_name: gitlab-pages
 profile_gitlab::gitlab_pages_sd_service_tags: []
+profile_gitlab::gitlab_pages_exporter_port: 9235
+profile_gitlab::gitlab_pages_exporter_sd_service_name: gitlab-pages-exporter
+profile_gitlab::gitlab_pages_exporter_sd_service_tags: ['metrics']
 profile_gitlab::gitlab_ssh_host: "%{facts.networking.fqdn}"
 profile_gitlab::http_port: 80
 profile_gitlab::http_sd_service_name: 'gitlab-http'
