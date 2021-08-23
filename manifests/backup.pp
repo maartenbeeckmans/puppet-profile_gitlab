@@ -17,7 +17,7 @@ class profile_gitlab::backup (
     device => $device,
     owner  => 'git',
     group  => 'rsnapshot',
-    mode   => '0755',
+    mode   => '0700',
   }
 
   include profile_rsnapshot::user
