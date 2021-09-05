@@ -28,10 +28,6 @@ class profile_gitlab::sd_services (
   String              $gitlab_pages_sd_service_name          = $::profile_gitlab::gitlab_pages_sd_service_name,
   Array               $gitlab_pages_sd_service_tags          = $::profile_gitlab::gitlab_pages_sd_service_tags,
 
-  Stdlib::Port        $gitlab_pages_nginx_port               = $::profile_gitlab::gitlab_pages_nginx_port,
-  String              $gitlab_pages_nginx_sd_service_name    = $::profile_gitlab::gitlab_pages_nginx_sd_service_name,
-  Array               $gitlab_pages_nginx_sd_service_tags    = $::profile_gitlab::gitlab_pages_nginx_sd_service_tags,
-
   Stdlib::Port        $gitlab_pages_exporter_port            = $::profile_gitlab::gitlab_pages_exporter_port,
   String              $gitlab_pages_exporter_sd_service_name = $::profile_gitlab::gitlab_pages_exporter_sd_service_name,
   Array               $gitlab_pages_exporter_sd_service_tags = $::profile_gitlab::gitlab_pages_exporter_sd_service_tags,
@@ -39,10 +35,6 @@ class profile_gitlab::sd_services (
   Stdlib::Port        $registry_port                         = $::profile_gitlab::registry_port,
   String              $registry_sd_service_name              = $::profile_gitlab::registry_sd_service_name,
   Array               $registry_sd_service_tags              = $::profile_gitlab::registry_sd_service_tags,
-
-  Stdlib::Port        $registry_nginx_port                   = $::profile_gitlab::registry_nginx_port,
-  String              $registry_nginx_sd_service_name        = $::profile_gitlab::registry_nginx_sd_service_name,
-  Array               $registry_nginx_sd_service_tags        = $::profile_gitlab::registry_nginx_sd_service_tags,
 
   Stdlib::Port        $registry_debug_port                   = $::profile_gitlab::registry_debug_port,
   String              $registry_debug_sd_service_name        = $::profile_gitlab::registry_debug_sd_service_name,
@@ -114,17 +106,6 @@ class profile_gitlab::sd_services (
     tags   => $gitlab_pages_sd_service_tags,
   }
 
-  consul::service { $gitlab_pages_nginx_sd_service_name:
-    checks => [
-      {
-        http     => "http://${listen_address}:${gitlab_pages_nginx_port}/@status",
-        interval => '10s'
-      }
-    ],
-    port   => $gitlab_pages_nginx_port,
-    tags   => $gitlab_pages_nginx_sd_service_tags,
-  }
-
   consul::service { $gitlab_pages_exporter_sd_service_name:
     checks => [
       {
@@ -145,17 +126,6 @@ class profile_gitlab::sd_services (
     ],
     port   => $registry_port,
     tags   => $registry_sd_service_tags,
-  }
-
-  consul::service { $registry_nginx_sd_service_name:
-    checks => [
-      {
-        tcp      => "${listen_address}:${registry_nginx_port}",
-        interval => '10s'
-      }
-    ],
-    port   => $registry_nginx_port,
-    tags   => $registry_nginx_sd_service_tags,
   }
 
   consul::service { $registry_debug_sd_service_name:

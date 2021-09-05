@@ -8,8 +8,6 @@ class profile_gitlab::firewall (
   Stdlib::Port $postgres_exporter_port = $::profile_gitlab::postgres_exporter_port,
   Stdlib::Port $gitlab_exporter_port   = $::profile_gitlab::gitlab_exporter_port,
   Stdlib::Port $gitlab_pages_port      = $::profile_gitlab::gitlab_pages_port,
-  Stdlib::Port $gitlab_pages_nginx_port      = $::profile_gitlab::gitlab_pages_port,
-  Stdlib::Port $registry_nginx_port    = $::profile_gitlab::registry_nginx_port,
   Stdlib::Port $registry_port          = $::profile_gitlab::registry_port,
   Stdlib::Port $registry_debug_port    = $::profile_gitlab::registry_debug_port,
 ) {
@@ -40,16 +38,6 @@ class profile_gitlab::firewall (
 
   firewall { "0${gitlab_pages_port} allow gitlab pages":
     dport  => $gitlab_pages_port,
-    action => 'accept',
-  }
-
-  firewall { "0${gitlab_pages_nginx_port} allow gitlab pages nginx":
-    dport  => $gitlab_pages_port,
-    action => 'accept',
-  }
-
-  firewall { "0${registry_nginx_port} allow gitlab registry nginx":
-    dport  => $registry_nginx_port,
     action => 'accept',
   }
 

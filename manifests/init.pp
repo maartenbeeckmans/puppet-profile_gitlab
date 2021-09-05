@@ -20,9 +20,6 @@ class profile_gitlab (
   Stdlib::Port                               $gitlab_pages_port,
   String                                     $gitlab_pages_sd_service_name,
   Array                                      $gitlab_pages_sd_service_tags,
-  Stdlib::Port                               $gitlab_pages_nginx_port,
-  String                                     $gitlab_pages_nginx_sd_service_name,
-  Array                                      $gitlab_pages_nginx_sd_service_tags,
   Stdlib::Port                               $gitlab_pages_exporter_port,
   String                                     $gitlab_pages_exporter_sd_service_name,
   Array                                      $gitlab_pages_exporter_sd_service_tags,
@@ -52,9 +49,6 @@ class profile_gitlab (
   Stdlib::Port                               $registry_port,
   String                                     $registry_sd_service_name,
   Array                                      $registry_sd_service_tags,
-  Stdlib::Port                               $registry_nginx_port,
-  String                                     $registry_nginx_sd_service_name,
-  Array                                      $registry_nginx_sd_service_tags,
   Stdlib::Port                               $ssh_port,
   String                                     $ssh_sd_service_name,
   Array                                      $ssh_sd_service_tags,
@@ -74,7 +68,6 @@ class profile_gitlab (
 
   $_gitlab_pages_config = {
     'enable'       => true,
-    'listen_proxy' => "${listen_address}:${gitlab_pages_port}",
     'status_uri'   => '/@status',
     'metrics_address' => "${listen_address}:${gitlab_pages_exporter_port}"
   }
@@ -124,14 +117,13 @@ class profile_gitlab (
 
   $_registry_config = {
     'enable'             => true,
-    'registry_http_addr' => "${listen_address}:${registry_port}",
     'debug_addr'         => "${listen_address}:${registry_debug_port}",
   }
 
   $_registry_nginx_config = {
     'redirect_http_to_https' => false,
     'listen_addresses'       => [$listen_address],
-    'listen_port'            => $registry_nginx_port,
+    'listen_port'            => $registry_port,
    } 
 
   $_redis_exporter_config = {
@@ -142,7 +134,7 @@ class profile_gitlab (
   $_pages_nginx_config = {
     'redirect_http_to_https' => false,
     'listen_addresses'       => [$listen_address],
-    'listen_port'            => $gitlab_pages_nginx_port,
+    'listen_port'            => $gitlab_pages_port,
   }
 
   $_postgres_exporter_config = {
