@@ -76,6 +76,9 @@ profile_gitlab::runner::runner_defaults:
     volumes:
       - '/cache'
     shm_size: 0
+    pull_policy:
+      - 'always'
+      - 'if-not-present'
 
 profile_gitlab::runner::manage_repo: true
 profile_gitlab::runner::gitlab_runner_exporter_listen_address: "%{facts.networking.ip}"
